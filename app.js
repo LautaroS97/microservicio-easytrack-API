@@ -76,9 +76,10 @@ async function extractDataAndGenerateXML() {
             if (result.success) {
                 // Generar el XML correspondiente
                 const xml = xmlbuilder.create('Response')
-                    .ele('Say', { voice: 'Polly.Andres-Neural', language: "es-MX" }, result.text)
-                    .ele('Redirect', process.env.TWILIO_WEBHOOK_URL) // Usando variable de entorno para el webhook de Twilio
-                    .end({ pretty: true });
+                .ele('Say', { voice: 'Polly.Andres-Neural', language: "es-MX" }, result.text)
+                .up()
+                .ele('Redirect', process.env.TWILIO_WEBHOOK_URL)
+                .end({ pretty: true });
 
                 console.log(`XML generado para ${key}:\n${xml}`);
                 latestXml[key] = xml;
@@ -113,8 +114,10 @@ app.get('/voice/:busKey', (req, res) => {
         // Generar un XML de error en caso de no tener datos recientes
         const xml = xmlbuilder.create('Response')
             .ele('Say', { voice: 'Polly.Andres-Neural', language: "es-MX" }, 'Lo sentimos, no se pudo obtener la información en este momento. Por favor, intente nuevamente más tarde.')
-            .ele('Redirect', process.env.TWILIO_WEBHOOK_URL) // Usando variable de entorno para el webhook de Twilio
+            .up()
+            .ele('Redirect', process.env.TWILIO_WEBHOOK_URL)
             .end({ pretty: true });
+    
 
         res.type('application/xml');
         res.send(xml);
