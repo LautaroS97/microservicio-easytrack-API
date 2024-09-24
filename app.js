@@ -115,7 +115,7 @@ app.get('/voice/:busKey', (req, res) => {
         const xml = xmlbuilder.create('Response')
             .ele('Say', { voice: 'Polly.Andres-Neural', language: "es-MX" }, 'Lo sentimos, no se pudo obtener la información en este momento. Por favor, intente nuevamente más tarde.')
             .up()
-            .ele('Redirect', process.env.TWILIO_WEBHOOK_URL)
+            .ele('Redirect', { method: 'POST' }, process.env.TWILIO_WEBHOOK_URL)
             .end({ pretty: true });
     
 
