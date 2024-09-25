@@ -76,10 +76,10 @@ async function extractDataAndGenerateXML() {
             if (result.success) {
                 // Generar el XML correspondiente
                 const xml = xmlbuilder.create('Response')
-                .ele('Say', { voice: 'Polly.Andres-Neural', language: "es-MX" }, result.text)
+                .ele('Say', {}, result.text) // Eliminar voice y language para usar la voz por defecto de Twilio
                 .up()
-                .ele('Redirect', {}, `${process.env.TWILIO_WEBHOOK_URL}?FlowEvent=return`)  // Añadir el FlowEvent=return
-                .end({ pretty: true });
+                .ele('Redirect', {}, `${process.env.TWILIO_WEBHOOK_URL}?FlowEvent=return`)
+                .end({ pretty: true });            
 
                 console.log(`XML generado para ${key}:\n${xml}`);
                 latestXml[key] = xml;
@@ -113,10 +113,10 @@ app.get('/voice/:busKey', (req, res) => {
     } else {
         // Generar un XML de error en caso de no tener datos recientes
         const xml = xmlbuilder.create('Response')
-            .ele('Say', { voice: 'Polly.Andres-Neural', language: "es-MX" }, 'Lo sentimos, no se pudo obtener la información en este momento. Por favor, intente nuevamente más tarde.')
-            .up()
-            .ele('Redirect', { method: 'POST' }, `${process.env.TWILIO_WEBHOOK_URL}?FlowEvent=return`)  // Añadir el FlowEvent=return
-            .end({ pretty: true });
+        .ele('Say', {}, 'Lo sentimos, no se pudo obtener la información en este momento. Por favor, intente nuevamente más tarde.')
+        .up()
+        .ele('Redirect', { method: 'POST' }, `${process.env.TWILIO_WEBHOOK_URL}?FlowEvent=return`)
+        .end({ pretty: true });
 
         res.type('application/xml');
         res.send(xml);
