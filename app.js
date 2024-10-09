@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const xmlbuilder = require('xmlbuilder');
+const HttpsProxyAgent = require('https-proxy-agent');
 require('dotenv').config(); // Cargar variables de entorno desde el archivo .env
 
 const app = express();
@@ -26,12 +27,23 @@ const apiCredentials = {
     password: process.env.API_PASSWORD,
 };
 
-// Función para obtener el token de autenticación
+// Configuración del proxy (actualiza con tu configuración)
+const proxyAgent = new HttpsProxyAgent('http://user:password@proxyserver:port');
+
+// Función para agregar un retraso entre solicitudes
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Función para obtener el token de autenticación con mayor tiempo de espera y uso de proxy
 async function obtenerToken() {
     try {
         const response = await axios.post('https://apiavl.easytrack.com.ar/sessions/auth/', {
             username: apiCredentials.username,
             password: apiCredentials.password,
+        }, {
+            timeout: 10000, // 10 segundos de timeout
+            httpsAgent: proxyAgent // Configuración del proxy
         });
         return response.data.jwt; // Retornar el token JWT
     } catch (error) {
@@ -40,13 +52,17 @@ async function obtenerToken() {
     }
 }
 
-// Función para obtener la ubicación de un bus a partir de su matrícula
+// Función para obtener la ubicación de un bus a partir de su matrícula con retraso
 async function obtenerUbicacionBus(token, matricula) {
     try {
+        // Retraso de 2 segundos entre solicitudes
+        await delay(2000);
         const response = await axios.get(`https://apiavl.easytrack.com.ar/positions/${matricula}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
+            timeout: 10000, // 10 segundos de timeout
+            httpsAgent: proxyAgent // Configuración del proxy
         });
 
         const busData = response.data[0]; // Tomamos el primer elemento del array
