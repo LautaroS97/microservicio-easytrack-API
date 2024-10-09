@@ -1,7 +1,6 @@
 const express = require('express');
 const axios = require('axios');
 const xmlbuilder = require('xmlbuilder');
-const HttpsProxyAgent = require('https-proxy-agent');
 require('dotenv').config(); // Cargar variables de entorno desde el archivo .env
 
 const app = express();
@@ -27,42 +26,27 @@ const apiCredentials = {
     password: process.env.API_PASSWORD,
 };
 
-// Configuración del proxy (reemplaza con la configuración correcta)
-const proxyAgent = new HttpsProxyAgent('http://user:password@proxyserver:port');
-
-// Función para agregar un retraso entre solicitudes
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Función para obtener el token de autenticación con mayor tiempo de espera y uso de proxy
+// Función para obtener el token de autenticación
 async function obtenerToken() {
     try {
         const response = await axios.post('https://apiavl.easytrack.com.ar/sessions/auth/', {
             username: apiCredentials.username,
             password: apiCredentials.password,
-        }, {
-            timeout: 10000, // 10 segundos de timeout
-            httpsAgent: proxyAgent // Configuración del proxy
         });
         return response.data.jwt; // Retornar el token JWT
     } catch (error) {
-        console.error('Error de la API. El servidor no responde.', error.message);
+        console.error('Error de la API. El servidor no responde.');
         throw new Error('Error en la autenticación');
     }
 }
 
-// Función para obtener la ubicación de un bus a partir de su matrícula con retraso
+// Función para obtener la ubicación de un bus a partir de su matrícula
 async function obtenerUbicacionBus(token, matricula) {
     try {
-        // Retraso de 2 segundos entre solicitudes
-        await delay(2000);
         const response = await axios.get(`https://apiavl.easytrack.com.ar/positions/${matricula}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
-            timeout: 10000, // 10 segundos de timeout
-            httpsAgent: proxyAgent // Configuración del proxy
         });
 
         const busData = response.data[0]; // Tomamos el primer elemento del array
@@ -75,7 +59,7 @@ async function obtenerUbicacionBus(token, matricula) {
             return { success: false, text: '' };
         }
     } catch (error) {
-        console.error(`Error de la API. El servidor no responde al obtener la ubicación del bus ${matricula}.`, error.message);
+        console.error(`Error de la API. El servidor no responde al obtener la ubicación del bus ${matricula}.`);
         return { success: false, text: '' };
     }
 }
