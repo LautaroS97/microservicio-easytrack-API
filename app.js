@@ -35,7 +35,7 @@ async function obtenerToken() {
         });
         return response.data.jwt; // Retornar el token JWT
     } catch (error) {
-        console.error('Error al obtener el token:', error);
+        console.error('Error de la API. El servidor no responde.');
         throw new Error('Error en la autenticación');
     }
 }
@@ -48,7 +48,7 @@ async function obtenerUbicacionBus(token, matricula) {
                 Authorization: `Bearer ${token}`,
             },
         });
-        
+
         const busData = response.data[0]; // Tomamos el primer elemento del array
         if (busData && busData.position) {
             const direccionTruncada = busData.position.split(',').slice(0, 2).join(',').trim();
@@ -59,7 +59,7 @@ async function obtenerUbicacionBus(token, matricula) {
             return { success: false, text: '' };
         }
     } catch (error) {
-        console.error(`Error al obtener la ubicación del bus ${matricula}:`, error);
+        console.error(`Error de la API. El servidor no responde al obtener la ubicación del bus ${matricula}.`);
         return { success: false, text: '' };
     }
 }
