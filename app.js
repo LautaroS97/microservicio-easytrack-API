@@ -27,7 +27,7 @@ const apiCredentials = {
     password: process.env.API_PASSWORD,
 };
 
-// Configuración del proxy (actualiza con tu configuración)
+// Configuración del proxy (reemplaza con la configuración correcta)
 const proxyAgent = new HttpsProxyAgent('http://user:password@proxyserver:port');
 
 // Función para agregar un retraso entre solicitudes
@@ -47,7 +47,7 @@ async function obtenerToken() {
         });
         return response.data.jwt; // Retornar el token JWT
     } catch (error) {
-        console.error('Error de la API. El servidor no responde.');
+        console.error('Error de la API. El servidor no responde.', error.message);
         throw new Error('Error en la autenticación');
     }
 }
@@ -75,7 +75,7 @@ async function obtenerUbicacionBus(token, matricula) {
             return { success: false, text: '' };
         }
     } catch (error) {
-        console.error(`Error de la API. El servidor no responde al obtener la ubicación del bus ${matricula}.`);
+        console.error(`Error de la API. El servidor no responde al obtener la ubicación del bus ${matricula}.`, error.message);
         return { success: false, text: '' };
     }
 }
